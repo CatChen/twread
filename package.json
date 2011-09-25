@@ -1,7 +1,7 @@
 {
-  "name":        "facebook-template-node",
-  "version":     "0.0.1",
-  "description": "Template app for Heroku / Facebook integration, Node.js language",
+  "name":        "twread",
+  "version":     "0.1.0",
+  "description": "Twread is an app helps you to consume your tweets.",
   "dependencies": {
     "ejs": "0.4.3",
     "everyauth": "0.2.18",

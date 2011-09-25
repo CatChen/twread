@@ -15,7 +15,7 @@ everyauth.twitter
         console.log(accessToken);
         console.log(accessTokenSecret);
         console.log(twitterUserMetadata);
-        return({});
+        return(twitterUserMetadata);
     })
 
 everyauth.facebook
@@ -30,7 +30,7 @@ everyauth.facebook
         console.log(accessToken);
         console.log(accessTokenExtra);
         console.log(fbUserMetadata);
-        return({});
+        return(fbUserMetadata);
     })
 
 var facebook = new FacebookClient();

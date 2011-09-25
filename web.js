@@ -63,6 +63,9 @@ app.get('/', function(request, response) {
 
 app.get('/home', function(request, response) {
     if (request.session.auth) {
+        response.render('home', {
+            json: JSON.stringify(request.session.auth)
+        });
     } else {
         response.redirect('/');
     }

@@ -4,21 +4,6 @@ const everyauth = require('everyauth');
 const express = require('express');
 const FacebookClient = require('facebook-client').FacebookClient;
 
-var facebook = new FacebookClient();
-
-everyauth.facebook
-    .appId(process.env.FACEBOOK_APP_ID)
-    .appSecret(process.env.FACEBOOK_SECRET)
-    //.apiHost(process.env.APIGEE_FACEBOOK_API_ENDPOINT)
-    .scope('user_likes,user_photos,user_photo_video_tags')
-    .entryPath('/connect/facebook')
-    .redirectPath('/home')
-    .findOrCreateUser(function(session, accessToken, accessTokenExtra, fbUserMetadata) {
-        console.log('facebook connected');
-        console.log(arguments);
-        return({});
-    })
-
 everyauth.twitter
     .consumerKey(process.env.TWITTER_CONSUMER_KEY)
     .consumerSecret(process.env.TWITTER_CONSUMER_SECRET)
@@ -27,9 +12,28 @@ everyauth.twitter
     .redirectPath('/home')
     .findOrCreateUser(function (session, accessToken, accessTokenSecret, twitterUserMetadata) {
         console.log('twitter connected');
-        console.log(arguments);
+        console.log(accessToken);
+        console.log(accessTokenSecret);
+        console.log(twitterUserMetadata);
         return({});
     })
+
+everyauth.facebook
+    .appId(process.env.FACEBOOK_APP_ID)
+    .appSecret(process.env.FACEBOOK_SECRET)
+    //.apiHost(process.env.APIGEE_FACEBOOK_API_ENDPOINT)
+    .scope('email,publish_actions'/* + ',user_likes,user_photos,user_photo_video_tags'*/)
+    .entryPath('/connect/facebook')
+    .redirectPath('/home')
+    .findOrCreateUser(function(session, accessToken, accessTokenExtra, fbUserMetadata) {
+        console.log('facebook connected');
+        console.log(accessToken);
+        console.log(accessTokenExtra);
+        console.log(fbUserMetadata);
+        return({});
+    })
+
+var facebook = new FacebookClient();
 
 var app = express.createServer(
     express.logger(),
@@ -39,8 +43,8 @@ var app = express.createServer(
     express.session({ secret: process.env.SESSION_SECRET || 'secret123' }),
     function(request, response, next) {
         var method = request.headers['x-forwarded-proto'] || 'http';
-        everyauth.facebook.myHostname(method + '://' + request.headers.host);
         everyauth.twitter.myHostname(method + '://' + request.headers.host);
+        everyauth.facebook.myHostname(method + '://' + request.headers.host);
         next();
     },
     everyauth.middleware(),

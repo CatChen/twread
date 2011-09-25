@@ -1,14 +1,26 @@
 {
-  "name":        "twread",
-  "version":     "0.1.0",
-  "description": "Twread is an app helps you to consume your tweets.",
-  "dependencies": {
-    "ejs": "0.4.3",
-    "everyauth": "0.2.18",
-    "express": "2.4.6",
-    "facebook-client": "1.3.0",
-    "facebook": "0.0.3",
-    "node-uuid": "1.2.0",
-    "socket.io": "0.8.4"
-  }
+    "name": "twread",
+    "description": "Twread is an app helps you to consume your tweets.",
+    "homepage": "https://twread.herokuapp.com",
+    "version": "0.1.0",
+    "author": {
+        "name": "Cat Chen",
+        "email": "catchen@catchen.me",
+        "web": "http://catchen.me"
+    },
+    "dependencies": {
+        "ejs": "0.4.3",
+        "everyauth": "0.2.18",
+        "express": "2.4.6",
+        "facebook-client": "1.3.0",
+        "facebook": "0.0.3",
+        "node-uuid": "1.2.0",
+        "socket.io": "0.8.4"
+    },
+    "repositories": [
+        {
+            "type": "git",
+            "url": "git://github.com/CatChen/twread.git"
+        }
+    ]
 }

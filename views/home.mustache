@@ -5,6 +5,28 @@
 	<title>Home</title>
 </head>
 <body>
-	{{json}}
+    {{#auth}}
+	<div class="twitter panel">
+	   {{#twitter}}
+	   {{#user}}
+	   <div class="id">{{id}}</div>
+	   <div class="screenName">{{#screen_name}}</div>
+	   <div class="name">{{#name}}</div>
+	   {{/user}}
+       {{/twitter}}
+	</div>
+	<div class="facebook panel">
+	   {{#facebook}}
+	   {{#user}}
+	   <div class="id">{{id}}</div>
+	   <div class="username">{{#username}}</div>
+	   <div class="name">{{#name}}</div>
+	   {{/user}}
+	   {{/facebook}}
+	   {{^facebook}}
+   	   <a href="/connect/facebook">Connect with Facebook</a>
+	   {{/facebook}}
+	</div>
+	{{/auth}}
 </body>
 </html>

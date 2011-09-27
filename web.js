@@ -89,7 +89,9 @@ app.get('/', function(request, response) {
 app.get('/home', function(request, response) {
     if (request.session.auth && request.session.auth.twitter) {
         response.render('home', {
-            auth: request.session.auth
+            auth: request.session.auth,
+            twitter: JSON.stringify(request.session.auth.twitter),
+            facebook: request.session.auth.facebook ? JSON.stringify(request.session.auth.facebook) : ''
         });
     } else {
         response.redirect('/');
@@ -97,15 +99,24 @@ app.get('/home', function(request, response) {
 });
 
 app.get('/connect/twitter/callback', function(request, response, next) {
-    console.log('/connect/twitter/callback captured');
-    console.log(!!request.session.auth.twitter);
-    console.log(!!request.session.auth.facebook);
+    var connections = db.collection('connections');
+    connections.findOne({ twitter: request.session.auth.twitter.user.id }, function(error, connection) {
+        if (connection) {
+            if (connection.facebook) {
+                /* create request.session.auth.facebook */
+            }
+        }
+    });
     response.redirect('/home');
 });
 
 app.get('/connect/facebook/callback', function(request, response, next) {
-    console.log('/connect/facebook/callback captured');
-    console.log(!!request.session.auth.twitter);
-    console.log(!!request.session.auth.facebook);
+    var connections = db.collection('connections');
+    connections.findOne({ twitter: request.session.auth.twitter.user.id }, function(error, connection) {
+        if (!connection) {
+            connection = { twitter: request.session.auth.twitter.user.id };
+        }
+        connection.facebook = request.session.auth.facebook.user.id;
+    });
     response.redirect('/home');
 });

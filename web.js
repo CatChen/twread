@@ -135,7 +135,7 @@ app.get('/connect/twitter/callback', function(request, response, next) {
                 if (error) { next(error); }
                 if (connection) {
                     if (connection.facebook) {
-                        facebook.findOne({ user: { id: connection.facebook }}, function(error, user) {
+                        facebook.findOne({ 'user.id': connection.facebook }, function(error, user) {
                             if (error) { next(error); }
                             if (user) {
                                 request.session.auth.facebook = user;

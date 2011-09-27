@@ -117,6 +117,11 @@ app.get('/home', function(request, response) {
     }
 });
 
+app.get('/disconnect', function(request, response) {
+    request.session.destroy();
+    response.redirect('/');
+});
+
 app.get('/connect/twitter/callback', function(request, response, next) {
     var twitter = db.collection('twitter');
     var facebook = db.collection('facebook');
@@ -124,13 +129,7 @@ app.get('/connect/twitter/callback', function(request, response, next) {
     
     twitter.findOne({ 'user.id': request.session.auth.twitter.user.id }, function(error, user) {
         if (error) { next(error); }
-        console.log(request.session.auth.twitter.user.id);
-        console.log(user);
-        if (!user) {
-            user = request.session.auth.twitter;
-        } else {
-            user = _.extend(user, request.session.auth.twitter)
-        }
+        user = _.extend(user || {}, request.session.auth.twitter)
         twitter.save(user, function(error, user) {
             if (error) { next(error); }
             connections.findOne({ twitter: request.session.auth.twitter.user.id }, function(error, connection) {
@@ -161,11 +160,7 @@ app.get('/connect/facebook/callback', function(request, response, next) {
     
     facebook.findOne({ 'user.id': request.session.auth.facebook.user.id }, function(error, user) {
         if (error) { next(error); }
-        if (!user) {
-            user = request.session.auth.facebook;
-        } else {
-            user = _.extend(user, request.session.auth.facebook);
-        }
+        user = _.extend(user || {}, request.session.auth.facebook);
         facebook.save(user, function(error, user) {
             if (error) { next(error); }
             connections.findOne({ twitter: request.session.auth.twitter.user.id }, function(error, connection) {

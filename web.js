@@ -122,20 +122,20 @@ app.get('/connect/twitter/callback', function(request, response, next) {
     var connections = db.collection('connections');
     
     twitter.findOne({ id: request.session.auth.twitter.user.id }, function(error, user) {
-        if (error) { throw error; }
+        if (error) { next(error); }
         if (!user) {
             user = request.session.auth.twitter;
         } else {
             user = _.extend(user, request.session.auth.twitter)
         }
         twitter.save(user, function(error, user) {
-            if (error) { throw error; }
+            if (error) { next(error); }
             connections.findOne({ twitter: request.session.auth.twitter.user.id }, function(error, connection) {
-                if (error) { throw error; }
+                if (error) { next(error); }
                 if (connection) {
                     if (connection.facebook) {
                         facebook.findOne({ user: { id: connection.facebook }}, function(error, user) {
-                            if (error) { throw error; }
+                            if (error) { next(error); }
                             if (user) {
                                 request.session.auth.facebook = user;
                             }
@@ -155,16 +155,16 @@ app.get('/connect/facebook/callback', function(request, response, next) {
     var connections = db.collection('connections');
     
     facebook.findOne({ id: request.session.auth.facebook.user.id }, function(error, user) {
-        if (error) { throw error; }
+        if (error) { next(error); }
         if (!user) {
             user = request.session.auth.facebook;
         } else {
             user = _.extend(user, request.session.auth.facebook);
         }
         facebook.save(user, function(error, user) {
-            if (error) { throw error; }
+            if (error) { next(error); }
             connections.findOne({ twitter: request.session.auth.twitter.user.id }, function(error, connection) {
-                if (error) { throw error; }
+                if (error) { next(error); }
                 if (!connection) {
                     connection = { twitter: request.session.auth.twitter.user.id };
                 }

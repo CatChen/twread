@@ -36,14 +36,15 @@ everyauth.facebook
     .redirectPath('/home')
     .findOrCreateUser(function(session, accessToken, accessTokenExtra, fbUserMetadata) {
         console.log('Facebook connected for /' + fbUserMetadata.username);
-        var user = db.users.find({
-            facebook: {
-                id: fbUserMetadata.id
-            }
+        var user = db.facebook.find({
+            id: fbUserMetadata.id
         });
         if (!user) {
-            
+            user = fbUserMetadata;
         }
+        user.accessToken = accessToken;
+        user.accessTokenExtra = accessTokenExtra;
+        db.facebook.save(user);
         return(fbUserMetadata);
     })
 

@@ -15,15 +15,15 @@ everyauth.twitter
     .redirectPath('/home')
     .findOrCreateUser(function (session, accessToken, accessTokenSecret, twitterUserMetadata) {
         console.log('Twitter connected for @' + twitterUserMetadata.screen_name);
-        var user = db.collection('twitter').findOne({
-            id: twitterUserMetadata.id
+        var twitter = db.collection('twitter');
+        twitter.findOne({ id: twitterUserMetadata.id }, function(error, user) {
+            if (!user) {
+                user = twitterUserMetadata;
+            }
+            user.accessToken = accessToken;
+            user.accessTokenSecret = accessTokenSecret;
+            twitter.save(user);
         });
-        if (!user) {
-            user = twitterUserMetadata;
-        }
-        user.accessToken = accessToken;
-        user.accessTokenSecret = accessTokenSecret;
-        db.twitter.save(user);
         return(twitterUserMetadata);
     })
 
@@ -36,15 +36,15 @@ everyauth.facebook
     .redirectPath('/home')
     .findOrCreateUser(function(session, accessToken, accessTokenExtra, fbUserMetadata) {
         console.log('Facebook connected for /' + fbUserMetadata.username);
-        var user = db.collection('facebook').findOne({
-            id: fbUserMetadata.id
+        var facebook = db.collection('facebook');
+        facebook.findOne({ id: fbUserMetadata.id }, function(error, user) {
+            if (!user) {
+                user = fbUserMetadata;
+            }
+            user.accessToken = accessToken;
+            user.accessTokenExtra = accessTokenExtra;
+            db.facebook.save(user);
         });
-        if (!user) {
-            user = fbUserMetadata;
-        }
-        user.accessToken = accessToken;
-        user.accessTokenExtra = accessTokenExtra;
-        db.facebook.save(user);
         return(fbUserMetadata);
     })
 

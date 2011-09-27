@@ -1,12 +1,26 @@
 const path = require('path');
+const url = require('url');
 
 const _ = require('underscore');
-const mongo = require('mongoskin');
-const everyauth = require('everyauth');
 const express = require('express');
+const mongo = require('mongoskin');
+const redis = require('redis');
+const connectRedis = require('connect-redis')(express);
+const everyauth = require('everyauth');
 const FacebookClient = require('facebook-client').FacebookClient;
 
 var db = mongo.db(process.env.MONGOLAB_URI);
+
+var redisConnectSessionStore = (function() {
+    var store;
+    var redisURL = url.parse(process.env.REDISTOGO_URL);
+    store = new connectRedis({
+        port: redisURL.port,
+        host: redisURL.hostname,
+        pass: redisURL.auth.split(":")[1]
+    });
+    return store;
+})();
 
 everyauth.twitter
     .consumerKey(process.env.TWITTER_CONSUMER_KEY)
@@ -60,7 +74,7 @@ var app = express.createServer(
     express.static(__dirname + '/public'),
     express.cookieParser(),
     express.bodyParser(),
-    express.session({ secret: process.env.SESSION_SECRET || 'secret123' }),
+    express.session({ secret: process.env.SESSION_SECRET || 'catchen@catchen.me', store: redisConnectSessionStore  }),
     function(request, response, next) {
         var method = request.headers['x-forwarded-proto'] || 'http';
         everyauth.twitter.myHostname(method + '://' + request.headers.host);
@@ -117,6 +131,7 @@ app.get('/connect/facebook/callback', function(request, response, next) {
             connection = { twitter: request.session.auth.twitter.user.id };
         }
         connection.facebook = request.session.auth.facebook.user.id;
+        connections.save(connection);
     });
     response.redirect('/home');
 });

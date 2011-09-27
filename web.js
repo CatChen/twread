@@ -123,6 +123,8 @@ app.get('/connect/twitter/callback', function(request, response, next) {
     var connections = db.collection('connections');
     
     twitter.findOne({ id: request.session.auth.twitter.user.id }, function(error, user) {
+        console.log('point 1');
+        console.log(error);
         if (error) { next(error); }
         if (!user) {
             user = request.session.auth.twitter;
@@ -130,12 +132,18 @@ app.get('/connect/twitter/callback', function(request, response, next) {
             user = _.extend(user, request.session.auth.twitter)
         }
         twitter.save(user, function(error, user) {
+            console.log('point 2');
+            console.log(error);
             if (error) { next(error); }
             connections.findOne({ twitter: request.session.auth.twitter.user.id }, function(error, connection) {
+                console.log('point 3');
+                console.log(error);
                 if (error) { next(error); }
                 if (connection) {
                     if (connection.facebook) {
                         facebook.findOne({ user: { id: connection.facebook }}, function(error, user) {
+                            console.log('point 4');
+                            console.log(error);
                             if (error) { next(error); }
                             if (user) {
                                 request.session.auth.facebook = user;

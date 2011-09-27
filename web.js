@@ -30,6 +30,7 @@ everyauth.twitter
     .redirectPath('/connect/twitter/callback')
     .findOrCreateUser(function (session, accessToken, accessTokenSecret, twitterUserMetadata) {
         console.log('Twitter connected for @' + twitterUserMetadata.screen_name);
+        /*
         var twitter = db.collection('twitter');
         twitter.findOne({ id: twitterUserMetadata.id }, function(error, user) {
             if (!user) {
@@ -41,6 +42,7 @@ everyauth.twitter
             user.accessTokenSecret = accessTokenSecret;
             twitter.save(user);
         });
+        */
         return(twitterUserMetadata);
     })
 
@@ -53,6 +55,7 @@ everyauth.facebook
     .redirectPath('/connect/facebook/callback')
     .findOrCreateUser(function(session, accessToken, accessTokenExtra, fbUserMetadata) {
         console.log('Facebook connected for /' + fbUserMetadata.username);
+        /*
         var facebook = db.collection('facebook');
         facebook.findOne({ id: fbUserMetadata.id }, function(error, user) {
             if (!user) {
@@ -64,6 +67,7 @@ everyauth.facebook
             user.accessTokenExtra = accessTokenExtra;
             facebook.save(user);
         });
+        */
         return(fbUserMetadata);
     })
 
@@ -113,25 +117,61 @@ app.get('/home', function(request, response) {
 });
 
 app.get('/connect/twitter/callback', function(request, response, next) {
+    var twitter = db.collection('twitter');
+    var facebook = db.connection('facebook');
     var connections = db.collection('connections');
-    connections.findOne({ twitter: request.session.auth.twitter.user.id }, function(error, connection) {
-        if (connection) {
-            if (connection.facebook) {
-                /* create request.session.auth.facebook */
-            }
+    
+    twitter.findOne({ id: request.session.auth.twitter.user.id }, function(error, user) {
+        if (error) { throw error; }
+        if (!user) {
+            user = request.session.auth.twitter;
+        } else {
+            user = _.extend(user, request.session.auth.twitter)
         }
+        twitter.save(user, function(error, user) {
+            if (error) { throw error; }
+            connections.findOne({ twitter: request.session.auth.twitter.user.id }, function(error, connection) {
+                if (error) { throw error; }
+                if (connection) {
+                    if (connection.facebook) {
+                        facebook.findOne({ user: { id: connection.facebook }}, function(error, user) {
+                            if (error) { throw error; }
+                            if (user) {
+                                request.session.auth.facebook = user;
+                            }
+                            response.redirect('/home');
+                        });
+                    } else {
+                        response.redirect('/home');
+                    }
+                }
+            });
+        });
     });
-    response.redirect('/home');
 });
 
 app.get('/connect/facebook/callback', function(request, response, next) {
+    var facebook = db.collection('facebook');
     var connections = db.collection('connections');
-    connections.findOne({ twitter: request.session.auth.twitter.user.id }, function(error, connection) {
-        if (!connection) {
-            connection = { twitter: request.session.auth.twitter.user.id };
+    
+    facebook.findOne({ id: request.session.auth.facebook.user.id }, function(error, user) {
+        if (error) { throw error; }
+        if (!user) {
+            user = request.session.auth.facebook;
+        } else {
+            user = _.extend(user, request.session.auth.facebook);
         }
-        connection.facebook = request.session.auth.facebook.user.id;
-        connections.save(connection);
+        facebook.save(user, function(error, user) {
+            if (error) { throw error; }
+            connections.findOne({ twitter: request.session.auth.twitter.user.id }, function(error, connection) {
+                if (error) { throw error; }
+                if (!connection) {
+                    connection = { twitter: request.session.auth.twitter.user.id };
+                }
+                connection.facebook = request.session.auth.facebook.user.id;
+                connections.save(connection);
+                response.redirect('/home');
+            });
+        });
     });
-    response.redirect('/home');
 });

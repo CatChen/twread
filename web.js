@@ -73,22 +73,23 @@ everyauth.facebook
 
 var facebook = new FacebookClient();
 
-var app = express.createServer(
-    express.logger(),
-    express.static(__dirname + '/public'),
-    express.cookieParser(),
-    express.bodyParser(),
-    express.session({ secret: process.env.SESSION_SECRET || 'catchen@catchen.me', store: redisConnectSessionStore  }),
-    function(request, response, next) {
-        var method = request.headers['x-forwarded-proto'] || 'http';
-        everyauth.twitter.myHostname(method + '://' + request.headers.host);
-        everyauth.facebook.myHostname(method + '://' + request.headers.host);
-        next();
-    },
-    everyauth.middleware(),
-    require('facebook').Facebook(),
-    express.errorHandler({ showStack: true, dumpExceptions: true })
-);
+var app = express.createServer();
+
+app.use(express.logger());
+app.use(express.cookieParser());
+app.use(express.bodyParser());
+app.use(express.session({ secret: process.env.SESSION_SECRET || 'catchen@catchen.me', store: redisConnectSessionStore  }));
+app.use(function(request, response, next) {
+    var method = request.headers['x-forwarded-proto'] || 'http';
+    everyauth.twitter.myHostname(method + '://' + request.headers.host);
+    everyauth.facebook.myHostname(method + '://' + request.headers.host);
+    next();
+});
+app.use(everyauth.middleware());
+app.use(require('facebook').Facebook());
+app.use(app.router);
+app.use(express.static(__dirname + '/public'));
+app.use(express.errorHandler({ showStack: true, dumpExceptions: true }));
 
 app.set("view engine", "mustache");
 app.set("views", path.join(__dirname, 'views'));

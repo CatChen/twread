@@ -122,7 +122,7 @@ app.get('/connect/twitter/callback', function(request, response, next) {
     var facebook = db.collection('facebook');
     var connections = db.collection('connections');
     
-    twitter.findOne({ id: request.session.auth.twitter.user.id }, function(error, user) {
+    twitter.findOne({ user: { id: request.session.auth.twitter.user.id }}, function(error, user) {
         if (error) { next(error); }
         if (!user) {
             user = request.session.auth.twitter;
@@ -157,7 +157,7 @@ app.get('/connect/facebook/callback', function(request, response, next) {
     var facebook = db.collection('facebook');
     var connections = db.collection('connections');
     
-    facebook.findOne({ id: request.session.auth.facebook.user.id }, function(error, user) {
+    facebook.findOne({ user: { id: request.session.auth.facebook.user.id }}, function(error, user) {
         if (error) { next(error); }
         if (!user) {
             user = request.session.auth.facebook;

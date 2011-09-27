@@ -63,8 +63,8 @@ var app = express.createServer(
         next();
     },
     everyauth.middleware(),
-    require('facebook').Facebook()
-    errorHandler({ showStack: true, dumpExceptions: true });
+    require('facebook').Facebook(),
+    express.errorHandler({ showStack: true, dumpExceptions: true })
 );
 
 app.set("view engine", "mustache");

@@ -118,7 +118,7 @@ app.get('/home', function(request, response) {
 
 app.get('/connect/twitter/callback', function(request, response, next) {
     var twitter = db.collection('twitter');
-    var facebook = db.connection('facebook');
+    var facebook = db.collection('facebook');
     var connections = db.collection('connections');
     
     twitter.findOne({ id: request.session.auth.twitter.user.id }, function(error, user) {

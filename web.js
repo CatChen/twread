@@ -22,7 +22,6 @@ everyauth.twitter
             }
             user.accessToken = accessToken;
             user.accessTokenSecret = accessTokenSecret;
-            console.log(twitter);
             twitter.save(user);
         });
         return(twitterUserMetadata);
@@ -44,7 +43,7 @@ everyauth.facebook
             }
             user.accessToken = accessToken;
             user.accessTokenExtra = accessTokenExtra;
-            db.facebook.save(user);
+            facebook.save(user);
         });
         return(fbUserMetadata);
     })

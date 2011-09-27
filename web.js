@@ -124,6 +124,8 @@ app.get('/connect/twitter/callback', function(request, response, next) {
     
     twitter.findOne({ 'user.id': request.session.auth.twitter.user.id }, function(error, user) {
         if (error) { next(error); }
+        console.log(request.session.auth.twitter.user.id);
+        console.log(user);
         if (!user) {
             user = request.session.auth.twitter;
         } else {

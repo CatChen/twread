@@ -1,8 +1,11 @@
 const path = require('path');
 
+const mongo = require('mongoskin');
 const everyauth = require('everyauth');
 const express = require('express');
 const FacebookClient = require('facebook-client').FacebookClient;
+
+var db = mongo.db(process.env.MONGOLAB_URI);
 
 everyauth.twitter
     .consumerKey(process.env.TWITTER_CONSUMER_KEY)
@@ -11,10 +14,16 @@ everyauth.twitter
     .entryPath('/connect/twitter')
     .redirectPath('/home')
     .findOrCreateUser(function (session, accessToken, accessTokenSecret, twitterUserMetadata) {
-        console.log('twitter connected');
-        console.log(accessToken);
-        console.log(accessTokenSecret);
-        console.log(twitterUserMetadata);
+        console.log('Twitter connected for @' + twitterUserMetadata.screen_name);
+        var user = db.twitter.find({
+            id: twitterUserMetadata.id
+        });
+        if (!user) {
+            user = twitterUserMetadata;
+        }
+        user.accessToken = accessToken;
+        user.accessTokenSecret = accessTokenSecret;
+        db.twitter.save(user);
         return(twitterUserMetadata);
     })
 
@@ -26,10 +35,15 @@ everyauth.facebook
     .entryPath('/connect/facebook')
     .redirectPath('/home')
     .findOrCreateUser(function(session, accessToken, accessTokenExtra, fbUserMetadata) {
-        console.log('facebook connected');
-        console.log(accessToken);
-        console.log(accessTokenExtra);
-        console.log(fbUserMetadata);
+        console.log('Facebook connected for /' + fbUserMetadata.username);
+        var user = db.users.find({
+            facebook: {
+                id: fbUserMetadata.id
+            }
+        });
+        if (!user) {
+            
+        }
         return(fbUserMetadata);
     })
 

@@ -15,7 +15,7 @@ everyauth.twitter
     .redirectPath('/home')
     .findOrCreateUser(function (session, accessToken, accessTokenSecret, twitterUserMetadata) {
         console.log('Twitter connected for @' + twitterUserMetadata.screen_name);
-        var user = db.twitter.find({
+        var user = db.collection('twitter').findOne({
             id: twitterUserMetadata.id
         });
         if (!user) {
@@ -36,7 +36,7 @@ everyauth.facebook
     .redirectPath('/home')
     .findOrCreateUser(function(session, accessToken, accessTokenExtra, fbUserMetadata) {
         console.log('Facebook connected for /' + fbUserMetadata.username);
-        var user = db.facebook.find({
+        var user = db.collection('facebook').findOne({
             id: fbUserMetadata.id
         });
         if (!user) {

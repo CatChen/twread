@@ -22,6 +22,7 @@ everyauth.twitter
             }
             user.accessToken = accessToken;
             user.accessTokenSecret = accessTokenSecret;
+            console.log(twitter);
             twitter.save(user);
         });
         return(twitterUserMetadata);

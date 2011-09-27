@@ -13,7 +13,7 @@ everyauth.twitter
     .consumerSecret(process.env.TWITTER_CONSUMER_SECRET)
     //.apiHost(process.env.APIGEE_TWITTER_API_ENDPOINT)
     .entryPath('/connect/twitter')
-    .redirectPath('/home')
+    .redirectPath('/connect/twitter/callback')
     .findOrCreateUser(function (session, accessToken, accessTokenSecret, twitterUserMetadata) {
         console.log('Twitter connected for @' + twitterUserMetadata.screen_name);
         var twitter = db.collection('twitter');
@@ -36,7 +36,7 @@ everyauth.facebook
     //.apiHost(process.env.APIGEE_FACEBOOK_API_ENDPOINT)
     .scope('email,publish_actions'/* + ',user_likes,user_photos,user_photo_video_tags'*/)
     .entryPath('/connect/facebook')
-    .redirectPath('/home')
+    .redirectPath('/connect/facebook/callback')
     .findOrCreateUser(function(session, accessToken, accessTokenExtra, fbUserMetadata) {
         console.log('Facebook connected for /' + fbUserMetadata.username);
         var facebook = db.collection('facebook');
@@ -96,9 +96,16 @@ app.get('/home', function(request, response) {
     }
 });
 
-app.get('/auth/facebook/callback', function(request, response, next) {
-    console.log('/auth/facebook/callback captured');
+app.get('/connect/twitter/callback', function(request, response, next) {
+    console.log('/connect/twitter/callback captured');
     console.log(!!request.session.auth.twitter);
     console.log(!!request.session.auth.facebook);
-    next();
+    response.redirect('/home');
+});
+
+app.get('/connect/facebook/callback', function(request, response, next) {
+    console.log('/connect/facebook/callback captured');
+    console.log(!!request.session.auth.twitter);
+    console.log(!!request.session.auth.facebook);
+    response.redirect('/home');
 });

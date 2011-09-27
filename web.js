@@ -1,5 +1,6 @@
 const path = require('path');
 
+const _ = require('underscore');
 const mongo = require('mongoskin');
 const everyauth = require('everyauth');
 const express = require('express');
@@ -19,6 +20,8 @@ everyauth.twitter
         twitter.findOne({ id: twitterUserMetadata.id }, function(error, user) {
             if (!user) {
                 user = twitterUserMetadata;
+            } else {
+                user = _.extend(user, twitterUserMetadata)
             }
             user.accessToken = accessToken;
             user.accessTokenSecret = accessTokenSecret;
@@ -40,6 +43,8 @@ everyauth.facebook
         facebook.findOne({ id: fbUserMetadata.id }, function(error, user) {
             if (!user) {
                 user = fbUserMetadata;
+            } else {
+                user = _.extend(user, fbUserMetadata);
             }
             user.accessToken = accessToken;
             user.accessTokenExtra = accessTokenExtra;
@@ -89,4 +94,11 @@ app.get('/home', function(request, response) {
     } else {
         response.redirect('/');
     }
+});
+
+app.get('/auth/facebook/callback', function(request, response, next) {
+    console.log('/auth/facebook/callback captured');
+    console.log(!!request.session.auth.twitter);
+    console.log(!!request.session.auth.facebook);
+    next();
 });

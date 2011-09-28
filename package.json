@@ -22,7 +22,8 @@
         "hiredis": ">=0.1.12",
         "redis": ">=0.6.7",
         "connect-redis": ">=1.0.7",
-        "twitter": ">=v0.1.17"
+        "twitter": ">=v0.1.17",
+        "jshelpers": ">=1.0.6"
     },
     "repositories": [
         {

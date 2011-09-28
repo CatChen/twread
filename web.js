@@ -92,6 +92,7 @@ app.get('/home', function(request, response) {
         
         streams.retrieve(request.session.auth.twitter.user.id, function(stream) {
             if (stream) {
+                console.log('connected stream to socket: (' + request.session.auth.twitter.user.id + ', ' + socketId + ')');
                 stream.on('data', function (data) {
                     sockets.send(socketId, 'data', data);
                 });
@@ -209,4 +210,6 @@ var sockets = (function(io) {
             }
         }
     }
+    
+    return manager;
 })(io);

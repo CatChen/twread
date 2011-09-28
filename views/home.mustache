@@ -3,9 +3,18 @@
 <head>
 	<meta charset="UTF-8">
 	<title>Home</title>
+    <script type="text/javascript" src="/scripts/jquery.min.js"></script>
+    <script type="text/javascript" src="/socket.io/socket.io.js"></script>
+    <script type="text/javascript">
+    var socket = io.connect();
+
+    socket.on('connect', function() {
+        socket.emit('auth', '{{socketId}}');
+        
+    });
+    </script>
 </head>
 <body>
-    {{#auth}}
 	<div class="twitter panel">
         <h2>Twitter</h2>
         {{#twitter}}
@@ -15,6 +24,7 @@
         <div class="name"><label>name: </label>{{name}}</div>
         {{/user}}
         {{/twitter}}
+        <!--{{{twitterString}}}-->
 	</div>
 	<div class="facebook panel">
         <h2>Facebook</h2>
@@ -28,9 +38,7 @@
         {{^facebook}}
         <a href="/connect/facebook">Connect with Facebook</a>
         {{/facebook}}
+        <!--{{{facebookString}}}-->
 	</div>
-	{{/auth}}
-    <!--{{{twitter}}}-->
-    <!--{{{facebook}}}-->
 </body>
 </html>

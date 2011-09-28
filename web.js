@@ -10,8 +10,7 @@ const redis = require('redis');
 const connectRedis = require('connect-redis')(express);
 const everyauth = require('everyauth');
 const FacebookClient = require('facebook-client').FacebookClient;
-
-const twitterStreamingClient = require('twitter-streaming-client');
+var uuid = require('node-uuid');
 
 var db = mongo.db(process.env.MONGOLAB_URI);
 
@@ -81,16 +80,21 @@ app.listen(port, function() {
   console.log("Listening on " + port);
 });
 
+var io = require('socket.io').listen(app);
+
 app.get('/', function(request, response) {
     response.render('index');
 });
 
 app.get('/home', function(request, response) {
     if (request.session.auth && request.session.auth.twitter) {
+        var socketId = uuid();
         response.render('home', {
-            auth: request.session.auth,
-            twitter: JSON.stringify(request.session.auth.twitter),
-            facebook: request.session.auth.facebook ? JSON.stringify(request.session.auth.facebook) : ''
+            twitter: request.session.auth.twitter,
+            facebook: request.session.auth.facebook,
+            twitterString: JSON.stringify(request.session.auth.twitter),
+            facebookString: request.session.auth.facebook ? JSON.stringify(request.session.auth.facebook) : '',
+            socketId: socketId
         });
     } else {
         response.redirect('/');
@@ -156,12 +160,37 @@ app.get('/connect/facebook/callback', function(request, response, next) {
     });
 });
 
-/*(function() {
+var streams = (function(db) {
+    const twitterStreamingClient = require('twitter-streaming-client');
+    
     var twitter = db.collection('twitter');
     twitter.findItems({}, function(error, users) {
         if (error) throw error;
         _.each(users, function(user) {
-            twitterStreamingClient.connect(user.user.id, user.token, user.tokenSecret);
+            twitterStreamingClient.connect(user.user.id, user.accessToken, user.accessTokenSecret, function(stream) {
+                streams[user.user.id] = stream;
+            });
         });
     });
-})();*/
+    
+    return twitterStreamingClient;
+})(db);
+
+(function(io) {
+    var sockets = {};
+    
+    io.sockets.on('connection', function(socket) {
+        socket.on('auth', function(socketId) {
+            console.log('socket connected: ' + socketId)
+            sockets[socketId] = socket;
+            socket.set('socketId', socketId);
+        });
+        
+        socket.on('disconnect', function() {
+            socket.get('socketId', function(error, socketId) {
+                console.log('socket disconnected: ' + socketId);
+                delete sockets[socketId];
+            });
+        });
+    });
+})(io)

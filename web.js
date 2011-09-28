@@ -92,7 +92,7 @@ app.get('/home', function(request, response) {
         
         streams.retrieve(request.session.auth.twitter.user.id, function(stream) {
             if (stream) {
-                console.log('connected stream to socket: (' + request.session.auth.twitter.user.id + ', ' + socketId + ')');
+                console.log('connected stream:' + request.session.auth.twitter.user.id + ' to socket:' + socketId + '');
                 stream.on('data', function (data) {
                     sockets.send(socketId, 'data', data);
                 });
@@ -189,14 +189,14 @@ var sockets = (function(io) {
     
     io.sockets.on('connection', function(socket) {
         socket.on('auth', function(socketId) {
-            console.log('socket connected: ' + socketId)
+            console.log('socket:' + socketId + ' connected')
             sockets[socketId] = socket;
             socket.set('socketId', socketId);
         });
         
         socket.on('disconnect', function() {
             socket.get('socketId', function(error, socketId) {
-                console.log('socket disconnected: ' + socketId);
+                console.log('socket:' + socketId + ' disconnected')
                 delete sockets[socketId];
             });
         });

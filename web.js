@@ -89,6 +89,15 @@ app.get('/', function(request, response) {
 app.get('/home', function(request, response) {
     if (request.session.auth && request.session.auth.twitter) {
         var socketId = uuid();
+        
+        streams.retrieve(request.session.auth.twitter.user.id, function(stream) {
+            if (stream) {
+                stream.on('data', function (data) {
+                    sockets.sent(socketId, 'data', data);
+                });
+            }
+        });
+        
         response.render('home', {
             twitter: request.session.auth.twitter,
             facebook: request.session.auth.facebook,
@@ -167,16 +176,14 @@ var streams = (function(db) {
     twitter.findItems({}, function(error, users) {
         if (error) throw error;
         _.each(users, function(user) {
-            twitterStreamingClient.connect(user.user.id, user.accessToken, user.accessTokenSecret, function(stream) {
-                streams[user.user.id] = stream;
-            });
+            twitterStreamingClient.connect(user.user.id, user.accessToken, user.accessTokenSecret);
         });
     });
     
     return twitterStreamingClient;
 })(db);
 
-(function(io) {
+var sockets = (function(io) {
     var sockets = {};
     
     io.sockets.on('connection', function(socket) {
@@ -193,4 +200,13 @@ var streams = (function(db) {
             });
         });
     });
-})(io)
+    
+    var manager = {
+        send: function(socketId, name, data) {
+            var socket = sockets[socketId];
+            if (socket) {
+                socket.emit(name, data);
+            }
+        }
+    }
+})(io);

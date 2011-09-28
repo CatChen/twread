@@ -93,7 +93,7 @@ app.get('/home', function(request, response) {
         streams.retrieve(request.session.auth.twitter.user.id, function(stream) {
             if (stream) {
                 stream.on('data', function (data) {
-                    sockets.sent(socketId, 'data', data);
+                    sockets.send(socketId, 'data', data);
                 });
             }
         });

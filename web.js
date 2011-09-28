@@ -1,3 +1,5 @@
+require.paths.unshift(__dirname + '/lib');
+
 const path = require('path');
 const url = require('url');
 
@@ -8,6 +10,8 @@ const redis = require('redis');
 const connectRedis = require('connect-redis')(express);
 const everyauth = require('everyauth');
 const FacebookClient = require('facebook-client').FacebookClient;
+
+const twitterStreamingClient = require('twitter-streaming-client');
 
 var db = mongo.db(process.env.MONGOLAB_URI);
 
@@ -30,19 +34,8 @@ everyauth.twitter
     .redirectPath('/connect/twitter/callback')
     .findOrCreateUser(function (session, accessToken, accessTokenSecret, twitterUserMetadata) {
         console.log('Twitter connected for @' + twitterUserMetadata.screen_name);
-        /*
-        var twitter = db.collection('twitter');
-        twitter.findOne({ id: twitterUserMetadata.id }, function(error, user) {
-            if (!user) {
-                user = twitterUserMetadata;
-            } else {
-                user = _.extend(user, twitterUserMetadata)
-            }
-            user.accessToken = accessToken;
-            user.accessTokenSecret = accessTokenSecret;
-            twitter.save(user);
-        });
-        */
+        console.log('Twitter Access Token: ' + accessToken);
+        console.log('Twitter Access Token Secret: ' + accessTokenSecret);
         return(twitterUserMetadata);
     })
 
@@ -55,19 +48,6 @@ everyauth.facebook
     .redirectPath('/connect/facebook/callback')
     .findOrCreateUser(function(session, accessToken, accessTokenExtra, fbUserMetadata) {
         console.log('Facebook connected for /' + fbUserMetadata.username);
-        /*
-        var facebook = db.collection('facebook');
-        facebook.findOne({ id: fbUserMetadata.id }, function(error, user) {
-            if (!user) {
-                user = fbUserMetadata;
-            } else {
-                user = _.extend(user, fbUserMetadata);
-            }
-            user.accessToken = accessToken;
-            user.accessTokenExtra = accessTokenExtra;
-            facebook.save(user);
-        });
-        */
         return(fbUserMetadata);
     })
 
@@ -175,3 +155,13 @@ app.get('/connect/facebook/callback', function(request, response, next) {
         });
     });
 });
+
+/*(function() {
+    var twitter = db.collection('twitter');
+    twitter.findItems({}, function(error, users) {
+        if (error) throw error;
+        _.each(users, function(user) {
+            twitterStreamingClient.connect(user.user.id, user.token, user.tokenSecret);
+        });
+    });
+})();*/

@@ -119,20 +119,25 @@ app.get('/disconnect', function(request, response) {
 });
 
 app.get('/connect/twitter/redirect', function(request, response, next) {
+    console.log('/connect/twitter/redirect handled');
     var twitter = db.collection('twitter');
     var facebook = db.collection('facebook');
     var connections = db.collection('connections');
     
     twitter.findOne({ 'user.id': request.session.auth.twitter.user.id }, function(error, user) {
+        console.log(201);
         if (error) { next(error); }
         user = _.extend(user || {}, request.session.auth.twitter)
         twitter.save(user, function(error, user) {
+            console.log(202);
             if (error) { next(error); }
             connections.findOne({ twitter: request.session.auth.twitter.user.id }, function(error, connection) {
+                console.log(203);
                 if (error) { next(error); }
                 if (connection) {
                     if (connection.facebook) {
                         facebook.findOne({ 'user.id': connection.facebook }, function(error, user) {
+                            console.log(204);
                             if (error) { next(error); }
                             if (user) {
                                 request.session.auth.facebook = user;

@@ -2,16 +2,16 @@
     "name": "twread",
     "description": "Twread is an app helps you to consume your tweets.",
     "homepage": "https://twread.herokuapp.com",
-    "version": "0.1.0",
+    "version": "0.1.1",
     "author": {
         "name": "Cat Chen",
         "email": "catchen@catchen.me",
         "web": "http://catchen.me"
     },
     "dependencies": {
-        "ejs": "0.4.3",
+        "ejs": "2.5.5",
         "everyauth": "0.2.18",
-        "express": "2.4.6",
+        "express": "4.16.0",
         "facebook-client": "1.3.0",
         "facebook": "0.0.3",
         "node-uuid": "1.2.0",
@@ -24,10 +24,8 @@
         "connect-redis": "1.0.7",
         "twitter": ">=v0.1.17"
     },
-    "repositories": [
-        {
-            "type": "git",
-            "url": "git://github.com/CatChen/twread.git"
-        }
-    ]
+    "repository": {
+        "type": "git",
+        "url": "git://github.com/CatChen/twread.git"
+    }
 }
